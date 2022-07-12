@@ -1,0 +1,31 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  tr, td, th {
+    border: 1px solid black;
+  }
+  header {
+    text-align: center;
+    background-color: green;
+    color: white;
+  }
+  section {
+    display: flex;
+    gap:100px;
+  }
+  table{
+    text-align: center;
+  }
+  table td,th{
+    padding: .5rem 1rem;
+  }
+  main{
+    width: 70%;
+    margin: 80px auto;
+  }
+  #alert-container{
+    position: absolute;
+    right: 50px;
+  }

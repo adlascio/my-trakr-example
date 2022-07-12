@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>myTrakr</title>
+    <!-- jQuery file -->
+    <script src="./js/vendors/jquery.js"></script>
+    <!-- Bootstrap files -->
+    <script src="./js/vendors/bootstrap.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./css/index.css">
+  </head>
+  <body>
+    <header>
+      <h1>myTrakr</h1>
+    </header>
+    <div id="alert-container"></div>
+    <main>
+      <section>
+        <div>
+          <form id="form-account" action="">
+            <h2>New Account:</h2>
+            <input type="text" name="" id="account-input" />
+            <button>Add new account</button>
+          </form>
+          <form id="form-transaction" action="">
+            <h2>New Transaction:</h2> 
+            <div id="transaction-type-container">
+              <label for="transaction-type-deposit">Deposit</label>
+              <input type="radio" name="transaction-type" value="Deposit" />
+              <label for="transaction-type-withdraw">Withdraw</label>
+              <input type="radio" name="transaction-type" value="Withdraw" />
+              <label for="transaction-type-transfer">Transfer</label>
+              <input type="radio" name="transaction-type" value="Transfer" />
+            </div>
+            <div id="account">
+              <label for="select-account">Account:</label>
+              <select
+                name="select-account"
+                class="select-account"
+                id="select-account"
+              >
+                <option value="" selected disabled>Select account</option>
+              </select>
+            </div>
+            <div class="select-transfer">
+              <label for="select-from">From:</label>
+              <select name="select-from" class="select-account" id="select-from">
+                <option value="" selected disabled>Select account</option>
+              </select>
+            </div>
+            <div class="select-transfer">
+              <label for="select-to">To:</label>
+              <select name="select-to" class="select-account" id="select-to">
+                <option value="" selected disabled>Select account</option>
+              </select>
+            </div>
+            <div>
+              <label for="select-category">Category:</label>
+              <select name="select-category" id="select-category">
+                <option value="" selected disabled>Select category</option>
+                <option id="option-add-new" value="add-new">Add new...</option>
+              </select>
+              <input type="text" class="add-new-category" name="" id="" />
+              <button type="button" class="add-new-category">Add new category</button>
+            </div>
+            <div>
+              <label for="input-description">Description</label>
+              <input
+              type="text"
+                name="input-description"
+                id="input-description"
+              ></input>
+            </div>
+            
+            <div>
+              <label for="amount">Amount: </label>
+              <input type="number" name="amount" id="amount" step=".01" />
+            </div>
+            <button>Add transaction</button>
+          </form>
+        </div>
+        <div>
+          <h3>Account summary</h3>
+          <ul id="account-list">
+            
+          </ul>
+        </div>
+      </section>
+      <div id="container">
+        <div>
+          <label for="select-filter-account">Filter by account:</label>
+          <select name="select-filter-account" class="select-account" id="select-filter-account">
+            <option value="" selected disabled>Select account</option>
+            <option value="All">All</option>
+          </select>
+        </div>
+        <table id="transactions-table">
+          <tr id="table-header">
+            <th>Id</th>
+            <th>Username</th>
+            <th>Transaction Type</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>From</th>
+            <th>To</th>
+          </tr>
+        </table>
+      </div>
+    </main>
+    <script src="./js/helpers/Account.js"></script>
+    <script src="./js/helpers/Category.js"></script>
+    <script src="./js/helpers/Common.js"></script>
+    <script src="./js/helpers/Transaction.js"></script>
+    <script src="./js/index.js"></script>
+  </body>
+</html>
