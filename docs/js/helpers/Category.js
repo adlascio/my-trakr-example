@@ -1,3 +1,5 @@
+import { domainUrl } from './Common.js';
+
 const addCategoryToList = (category) => {
   $('#option-add-new').before(
     `<option value='${category}'>${category}</option>`
@@ -7,27 +9,28 @@ const addCategoryToList = (category) => {
   );
 };
 
-const loadCategories = () => {
-  $.get('http://localhost:3000/categories', (data, status) => {
+export const loadCategories = () => {
+  $.get(`${domainUrl}/categories`, (data) => {
     data.forEach((category) => {
       addCategoryToList(category.name);
     });
   });
 };
 
-const postCategory = (newCategory) => {
+export const postCategory = (newCategory) => {
   if (!newCategory) return;
   const data = { newCategory };
   $.ajax({
     type: 'post',
-    url: 'http://localhost:3000/categories',
+    url: `${domainUrl}/categories`,
     data: JSON.stringify(data),
-    contentType: 'application/json; charset=utf-8',
-    traditional: true,
-    success: (data) => {
-      addCategoryToList(data.name);
-      $('input.add-new-category').val('');
-      $('.add-new-category').hide();
-    },
+    contentType: 'application/json',
+    dataType: 'json',
+  }).done((data) => {
+    addCategoryToList(data.name);
+    $('input.add-new-category').val('');
+    $('.add-new-category').hide();
   });
 };
+
+export default { loadCategories, postCategory };

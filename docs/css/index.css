@@ -1,11 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
   }
-  tr, td, th {
-    border: 1px solid black;
+
+  body {
+    font-family: 'Poppins', sans-serif;
   }
+  
   header {
     text-align: center;
     background-color: green;
@@ -25,7 +29,73 @@
     width: 70%;
     margin: 80px auto;
   }
+  label {
+    margin-bottom: 0;
+  }
   #alert-container{
     position: absolute;
     right: 50px;
+  }
+  .amount-success{
+    color:green
+  }
+
+  .amount-danger{
+    color:red
+  }
+
+  .row-success{
+    border-left:5px solid green
+  }
+
+  .row-danger{
+    border-left:5px solid red;
+  }
+
+  #form-transaction{
+    display: flex;
+    flex-direction: column;
+  }
+  
+
+  #form-account{
+    display: flex;
+    flex-direction: column;
+  }
+
+  #transaction-type-container{
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .transaction-type-option{
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .transaction-form-field {
+    margin-bottom: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+  }
+
+  .add-btn{
+    width: 35%;
+    align-self: flex-end;
+  }
+
+  h2 {
+    border-bottom: 1px solid green;
+  }
+
+  ul{
+    list-style: none;
+  }
+  li{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, .125);
+    padding: .5rem 0;
   }

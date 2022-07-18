@@ -1,8 +1,10 @@
 //common functions that can be used in different cases
+import { loadAccounts } from './Account.js';
+import { loadCategories } from './Category.js';
 
 export const domainUrl = 'https://my-trakr-api.herokuapp.com';
 
-const addAlert = (status, message) => {
+export const addAlert = (status, message) => {
   $('#alert-container').append(`<div class="alert alert-${status}" role="alert">
     ${message}
   </div>`);
@@ -11,9 +13,12 @@ const addAlert = (status, message) => {
   }, 2000);
 };
 
-const init = () => {
+export const init = () => {
+  $('.select-transfer').hide();
+  $('.add-new-category').hide();
+  $('#noTransactionsMsg').show();
   loadAccounts();
   loadCategories();
 };
 
-export default { domainUrl };
+export default { domainUrl, addAlert, init };

@@ -1,3 +1,17 @@
+import {
+  getAccounts,
+  postAccount,
+  findAccountById,
+} from './helpers/Account.js';
+import { postCategory } from './helpers/Category.js';
+import { init, addAlert } from './helpers/Common.js';
+import {
+  validateTransaction,
+  getAllTransactions,
+  showAllTransactions,
+  postTransaction,
+} from './helpers/Transaction.js';
+
 $(() => {
   //Start coding here!
   init();
@@ -5,6 +19,7 @@ $(() => {
   $('#form-account').on('submit', (e) => {
     e.preventDefault();
     const username = $('#account-input').val();
+    const accounts = getAccounts();
     const exists = Object.values(accounts).indexOf(
       (account) => account.username === username
     );
@@ -19,7 +34,7 @@ $(() => {
     const newAccount = { username, transactions: [] };
     postAccount(newAccount);
   });
-  $('.select-transfer').hide();
+
   $("[name='transaction-type']").on('click', (e) => {
     const val = $('input[name="transaction-type"]:checked').val();
     if (val === 'Transfer') {
@@ -30,7 +45,7 @@ $(() => {
       $('#account').show();
     }
   });
-  $('.add-new-category').hide();
+
   $('#select-category').on('change', () => {
     const val = $('#select-category').val();
     if (val === 'add-new') {
@@ -39,6 +54,7 @@ $(() => {
       $('.add-new-category').hide();
     }
   });
+
   $('#form-transaction').on('submit', (e) => {
     e.preventDefault();
     const type = $('input[name="transaction-type"]:checked').val();
@@ -60,10 +76,12 @@ $(() => {
     if (!validateTransaction(transaction)) return;
     postTransaction(transaction);
   });
+
   $('button.add-new-category').on('click', () => {
-    const newCategory = $('input.add-new-category').val();
+    const newCategory = $('input[name=new-category]').val();
     postCategory(newCategory);
   });
+
   $('#select-filter-account').on('change', () => {
     const selectedAccount = $('#select-filter-account').val();
     let transactions;

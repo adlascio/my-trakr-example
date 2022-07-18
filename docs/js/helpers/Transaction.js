@@ -1,11 +1,40 @@
+import { findAccountById } from './Account.js';
+import { addAlert, domainUrl } from './Common.js';
+
 class Transaction {
-  constructor(amount, account, category, description = '', id, type) {
-    this.amount = amount;
-    this.account = account;
-    this.category = category;
-    this.description = description;
-    this.id = id;
-    this.type = type;
+  constructor(transaction) {
+    this.amount = transaction.amount;
+    this.accountId = transaction.accountId;
+    this.category = transaction.category;
+    this.description = transaction.description;
+    this.id = transaction.id;
+    this.type = transaction.type;
+    this.accountId = transaction.accountId;
+    this.accountIdFrom = transaction.accountIdFrom;
+    this.accountIdTo = transaction.accountIdTo;
+  }
+
+  get class() {
+    if (this.value > 0) {
+      return 'success';
+    } else {
+      return 'danger';
+    }
+  }
+
+  append(username, receiver, sender) {
+    $('#transactions-table').append(`
+      <tr class="table-row row-${this.class}">
+        <td>${this.id}</td>
+        <td>${username}</td>
+        <td>${this.type}</td>
+        <td>${this.category}</td>
+        <td>${this.description}</td>
+        <td class="amount-${this.class}">${this.value}</td>
+        <td>${receiver}</td>
+        <td>${sender}</td>
+       </tr>
+       `);
   }
 }
 
@@ -22,22 +51,8 @@ class Deposit extends Transaction {
 }
 
 class Transfer extends Transaction {
-  constructor(
-    amount,
-    account,
-    category,
-    description = '',
-    type,
-    id,
-    accountIdFrom,
-    accountIdTo
-  ) {
-    super(amount, account, category, description, type, id);
-    this.accountIdFrom = accountIdFrom;
-    this.accountIdTo = accountIdTo;
-  }
   get value() {
-    if (this.account.id == this.accountIdFrom) {
+    if (this.accountId == this.accountIdFrom) {
       return -this.amount;
     }
     return this.amount;
@@ -46,7 +61,7 @@ class Transfer extends Transaction {
 
 let allTransactions = [];
 
-const validateTransaction = (transaction) => {
+export const validateTransaction = (transaction) => {
   if (!transaction.type) {
     addAlert('danger', 'Please, select one type of transaction!');
     return false;
@@ -87,42 +102,32 @@ const validateTransaction = (transaction) => {
   return true;
 };
 
-const postTransaction = (newTransaction) => {
+export const postTransaction = (newTransaction) => {
   $.ajax({
     type: 'post',
-    url: 'http://localhost:3000/transaction',
+    url: `${domainUrl}/transaction`,
     data: JSON.stringify({ newTransaction }),
-    contentType: 'application/json; charset=utf-8',
-    traditional: true,
-    success: (data) => {
-      addAlert('success', 'Transaction successfuly created!');
-      data.forEach((transaction) => {
-        const accountFound = findAccountById(transaction.accountId);
-        if (accountFound) {
-          const newTransaction = createTransaction(transaction, accountFound);
-          newTransaction.commit();
-          addTransactionToList(newTransaction);
-          $(`#${newTransaction.account.id} .balance`).text(
-            newTransaction.account.balance
-          );
-        }
-      });
-    },
+    contentType: 'application/json',
+    dataType: 'json',
+  }).done((data) => {
+    addAlert('success', 'Transaction successfuly created!');
+    data.forEach((transaction) => {
+      const accountFound = findAccountById(transaction.accountId);
+      if (accountFound) {
+        const newTransaction = createTransaction(transaction, accountFound);
+        accountFound.transactions.push(newTransaction);
+        addTransactionToList(newTransaction);
+        $(`#${newTransaction.accountId} .balance`).text(accountFound.balance);
+      }
+    });
   });
 };
 
 const addTransactionToList = (transaction) => {
-  const {
-    type,
-    account,
-    accountIdTo,
-    accountIdFrom,
-    category,
-    description,
-    id,
-  } = transaction;
-  let senderUsername;
-  let receiverUsername;
+  const { type, accountId, accountIdTo, accountIdFrom } = transaction;
+  const account = findAccountById(accountId);
+  let senderUsername = 'n/a';
+  let receiverUsername = 'n/a';
   if (type === 'Transfer') {
     if (accountIdFrom == account.id) {
       senderUsername = account.username;
@@ -132,91 +137,34 @@ const addTransactionToList = (transaction) => {
       receiverUsername = account.username;
     }
   }
-  if (type === 'Deposit') {
-    senderUsername = account.username;
-    receiverUsername = 'n/a';
-  }
-  if (type === 'Withdraw') {
-    receiverUsername = account.username;
-    senderUsername = 'n/a';
-  }
 
-  $('#transactions-table').append(`
-      <tr class="table-row">
-        <td>${id}</td>
-        <td>${account.username}</td>
-        <td>${type}</td>
-        <td>${category}</td>
-        <td>${description}</td>
-        <td>${transaction.value}</td>
-        <td>${receiverUsername}</td>
-        <td>${senderUsername}</td>
-       </tr>
-       `);
+  transaction.append(account.username, senderUsername, receiverUsername);
 };
 
-const showAllTransactions = (transactions) => {
+export const showAllTransactions = (transactions) => {
+  if (!transactions.length) {
+    $('#noTransactionsMsg').show();
+    return;
+  }
+  $('#noTransactionsMsg').hide();
   transactions.sort((a, b) => a.id - b.id);
-  if (!transactions.length) return;
   $.each(transactions, (i, transaction) => {
     addTransactionToList(transaction);
   });
 };
 
-const createTransaction = (transaction, account) => {
-  const {
-    accountIdFrom,
-    accountIdTo,
-    amount,
-    category,
-    description,
-    id,
-    type,
-  } = transaction;
-  let newTransaction;
-  switch (type) {
-    case 'Withdraw':
-      newTransaction = new Withdrawal(
-        amount,
-        account,
-        category,
-        description,
-        id,
-        type
-      );
-      break;
-    case 'Deposit':
-      newTransaction = new Deposit(
-        amount,
-        account,
-        category,
-        description,
-        id,
-        type
-      );
-      break;
-    case 'Transfer':
-      newTransaction = new Transfer(
-        amount,
-        account,
-        category,
-        description,
-        id,
-        type,
-        accountIdFrom,
-        accountIdTo
-      );
-      break;
-    default:
-      break;
-  }
-  return newTransaction;
+export const createTransaction = (transaction) => {
+  if (transaction.type === 'Withdraw') return new Withdrawal(transaction);
+  if (transaction.type === 'Deposit') return new Deposit(transaction);
+  if (transaction.type === 'Transfer') return new Transfer(transaction);
 };
 
-const saveTransactions = (transactions) => {
+export const saveTransactions = (transactions) => {
   allTransactions = [...transactions];
 };
 
-const getAllTransactions = () => {
+export const getAllTransactions = () => {
   return allTransactions;
 };
+
+export default { saveTransactions, getAllTransactions, showAllTransactions };

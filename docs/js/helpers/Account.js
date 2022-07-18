@@ -1,3 +1,11 @@
+import { domainUrl } from './Common.js';
+import {
+  saveTransactions,
+  showAllTransactions,
+  createTransaction,
+} from './Transaction.js';
+import { addAlert } from './Common.js';
+
 class Account {
   constructor(id, username, transactions = []) {
     this.id = id;
@@ -23,41 +31,46 @@ const addAccountToList = (account) => {
   );
 };
 const addAccountToSummary = (newAccount) => {
+  const balance = newAccount.balance;
   $('#account-list').append(`
-        <li id=${newAccount.id}>${newAccount.username}: <span class='balance'>${newAccount.balance}</span> </li>
+        <li id=${newAccount.id}>${
+    newAccount.username
+  }: <span class='balance'>$ ${balance.toFixed(2)}</span> </li>
         `);
 };
 
-const loadAccounts = () => {
-  $.get(`${domainUrl}/accounts`, (data, status) => {
+export const loadAccounts = () => {
+  $.get(`${domainUrl}/accounts`, (data) => {
     let allTransactions = [];
-    data.forEach((account) => {
-      const { id, username, transactions } = account;
-      const updatedTransactions = transactions.map((transaction) => {
-        return createTransaction(transaction, account);
+    if (data.length > 0) {
+      $('#noAccountsMsg').hide();
+      data.forEach((account) => {
+        const { id, username, transactions } = account;
+        const updatedTransactions = transactions.map((transaction) => {
+          return createTransaction(transaction, account);
+        });
+        allTransactions = [...allTransactions, ...updatedTransactions];
+        const newAccount = new Account(id, username, updatedTransactions);
+        accounts[newAccount.id] = newAccount;
+        addAccountToList(newAccount);
+        addAccountToSummary(newAccount);
       });
-      allTransactions = [...allTransactions, ...updatedTransactions];
-      const newAccount = new Account(id, username, updatedTransactions);
-      accounts[newAccount.id] = newAccount;
-      addAccountToList(newAccount);
-      addAccountToSummary(newAccount);
-    });
-    saveTransactions(allTransactions);
-    showAllTransactions(allTransactions);
+      saveTransactions(allTransactions);
+      showAllTransactions(allTransactions);
+    }
   });
   return accounts;
 };
-const getAccounts = async () => {
-  const data = await $.get('http://localhost:3000/accounts');
-  return data.map((element) => {
-    console.log('el', element);
-    return new Account(element.username, element.transactions, element.id);
+export const getAccounts = async () => {
+  const data = await $.get(`${domainUrl}/accounts`);
+  return data.map((account) => {
+    return new Account(account.username, account.transactions, account.id);
   });
 };
-const postAccount = (newAccount) => {
+export const postAccount = (newAccount) => {
   $.ajax({
     type: 'post',
-    url: 'http://localhost:3000/accounts',
+    url: `${domainUrl}/accounts`,
     data: JSON.stringify({ newAccount }),
     contentType: 'application/json; charset=utf-8',
     traditional: true,
@@ -73,8 +86,8 @@ const postAccount = (newAccount) => {
   });
 };
 
-const findAccountById = (id) => {
-  return accounts.find((account) => {
-    return account.id == id;
-  });
+export const findAccountById = (id) => {
+  return accounts[id];
 };
+
+export default { findAccountById, getAccounts, postAccount, loadAccounts };
